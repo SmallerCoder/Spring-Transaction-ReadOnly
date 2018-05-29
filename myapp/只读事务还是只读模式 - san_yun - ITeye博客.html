@@ -1,0 +1,1135 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0036)http://san-yun.iteye.com/blog/494405 -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-CN" dir="ltr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <title>只读事务还是只读模式 - san_yun - ITeye博客</title>
+    <meta name="description" content="学习spring常常听说只读事务，到底什么是只读事务? “只读事务”的提法太过笼统.只读事务可以分为两个方面:JDBC和数据库。 JDBC的Connection对象有一个方法setReadOnly。JDK的API描述如下：   Puts this connection in read-only mode as a hint to thedriver to enable   database opti ...">
+    <meta name="keywords" content="Oracle, Spring, Hibernate, MySQL, JDBC 只读事务还是只读模式">
+    <link rel="shortcut icon" href="http://san-yun.iteye.com/images/favicon.ico" type="image/x-icon">
+    <link rel="search" type="application/opensearchdescription+xml" href="http://san-yun.iteye.com/open_search.xml" title="ITeye">
+    <link href="http://san-yun.iteye.com/rss" rel="alternate" title="san_yun" type="application/rss+xml">
+    <link href="./只读事务还是只读模式 - san_yun - ITeye博客_files/blog.css" media="screen" rel="stylesheet" type="text/css">
+<link href="./只读事务还是只读模式 - san_yun - ITeye博客_files/blue.css" media="screen" rel="stylesheet" type="text/css">
+    <script type="text/javascript" async="" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/pr.js.下载"></script><script type="text/javascript" async="" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/bvzdas.js.下载"></script><script charset="utf-8" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/b.js.下载"></script><script src="./只读事务还是只读模式 - san_yun - ITeye博客_files/push.js.下载"></script><script src="./只读事务还是只读模式 - san_yun - ITeye博客_files/hm.js.下载"></script><script src="./只读事务还是只读模式 - san_yun - ITeye博客_files/application.js.下载" type="text/javascript"></script>    
+    <script>
+    var _hmt = _hmt || [];
+    (function() {
+        var hm = document.createElement("script");
+        hm.src = "//hm.baidu.com/hm.js?e19a8b00cf63f716d774540875007664";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+
+
+        //自动推送工具代码
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        }
+        else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+
+
+      <link href="./只读事务还是只读模式 - san_yun - ITeye博客_files/SyntaxHighlighter.css" media="screen" rel="stylesheet" type="text/css">
+  <script src="./只读事务还是只读模式 - san_yun - ITeye博客_files/shCoreCommon.js.下载" type="text/javascript"></script>
+<script src="./只读事务还是只读模式 - san_yun - ITeye博客_files/hotkey.js.下载" type="text/javascript"></script>
+  <script src="./只读事务还是只读模式 - san_yun - ITeye博客_files/code_favorites.js.下载" type="text/javascript"></script>
+<script src="./只读事务还是只读模式 - san_yun - ITeye博客_files/weiboshare.js.下载" type="text/javascript"></script>
+
+    <!-- 请置于所有广告位代码之前 -->
+    <script src="./只读事务还是只读模式 - san_yun - ITeye博客_files/ds.js.下载"></script>
+    <link ref="canonical" href="http://san-yun.iteye.com/blog/494405">
+    <script src="./只读事务还是只读模式 - san_yun - ITeye博客_files/c.js.下载"></script><style type="text/css">.dp-j .annotation { color: #646464; }.dp-j .number { color: #C00000; }</style><style type="text/css">.dp-j .annotation { color: #646464; }.dp-j .number { color: #C00000; }</style><style type="text/css">.dp-j .annotation { color: #646464; }.dp-j .number { color: #C00000; }</style><style type="text/css">.dp-j .annotation { color: #646464; }.dp-j .number { color: #C00000; }</style></head><body><div id="BAIDU_DUP_fp_wrapper" style="position: absolute; left: -1px; bottom: -1px; z-index: 0; width: 0px; height: 0px; overflow: hidden; visibility: hidden; display: none;"><iframe id="BAIDU_DUP_fp_iframe" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/o.html" style="width: 0px; height: 0px; visibility: hidden; display: none;"></iframe></div><script onload="window[&#39;cambrian_sync_loader_success1527577725485807&#39;]()" onerror="window[&#39;cambrian_sync_loader_fail_1527577725485807&#39;]()" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/main.3f3745f7.js.下载"></script>
+  
+  
+    <div id="header">
+	      <div id="blog_site_nav">
+  <a href="http://www.iteye.com/" class="homepage">首页</a>
+  <a href="http://www.iteye.com/news">资讯</a>
+  <a href="http://www.iteye.com/magazines">精华</a>
+  <a href="http://www.iteye.com/forums">论坛</a>
+  <a href="http://www.iteye.com/ask">问答</a>
+  <a href="http://www.iteye.com/blogs">博客</a>
+  <a href="http://www.iteye.com/blogs/subjects">专栏</a>
+  <a href="http://www.iteye.com/groups">群组</a>
+  <a href="http://san-yun.iteye.com/blog/494405#" onclick="return false;" id="msna"><u>更多</u> <small>▼</small></a>
+  <div class="quick_menu" style="display:none;">
+    <a target="_blank" href="http://job.iteye.com/iteye">知识库</a>
+    <a href="http://www.iteye.com/search">搜索</a>
+  </div>
+</div>
+
+	      <div id="user_nav">
+
+      <a href="http://san-yun.iteye.com/login" class="welcome" title="登录">您还未登录 !</a>
+    <a href="http://san-yun.iteye.com/login">登录</a>
+    <!--<a href="/signup" class="nobg">注册</a>-->
+    <!--<a href="http://passport.csdn.net/account/mobileregister?from=http://www.iteye.com">注册</a>-->
+  </div>
+
+	    
+    </div>
+
+    <div id="page">
+        <div id="branding" class="clearfix" style="overflow: hidden;background: none;padding:0 0 2px;">
+          <!-- 广告位：PC端-iteye博客详情页顶部banner-960*90 -->
+          <script>
+              (function() {
+                  var s = "_" + Math.random().toString(36).slice(2);
+                  document.write('<div id="' + s + '"></div>');
+                  (window.slotbydup=window.slotbydup || []).push({
+                      id: '4773198',
+                      container: s,
+                      size: '960,60',
+                      display: 'inlay-fix'
+                  });
+              })();
+          </script><div id="_1t4ekvnj1tf"></div><script charset="utf-8" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/ccqm"></script><div id="_oxp0t52if9n" style=""><ins style="display:none;zoom:1;"></ins><iframe width="960" frameborder="0" height="90" scrolling="no" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/s.html"></iframe><em id="swhgfysa" style="width:0px;height:0px;margin-top:0px;"></em></div><script type="text/javascript" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/todpduxgx.js.下载"></script>
+        </div>
+      <div id="branding" class="clearfix">
+        <div id="blog_name">
+          <h1><a href="http://san-yun.iteye.com/">san_yun</a></h1>
+        </div>
+        <div id="fd"></div>
+        <div id="blog_navbar">
+          <ul>
+            <li class="blog_navbar_for"><a href="http://san-yun.iteye.com/"><strong>博客</strong></a></li>
+            <li><a href="http://san-yun.iteye.com/weibo">微博</a></li>
+            <li><a href="http://san-yun.iteye.com/album">相册</a></li>
+            <li><a href="http://san-yun.iteye.com/link">收藏</a></li>
+            <li><a href="http://san-yun.iteye.com/blog/guest_book">留言</a></li>
+            <li><a href="http://san-yun.iteye.com/blog/profile">关于我</a></li>
+          </ul>
+    
+          <div class="search">
+            <form action="http://san-yun.iteye.com/blog/search" method="get">
+              <input class="search_text" id="query" name="query" style="margin-left: 10px;width: 110px;" type="text" value="">
+              <input class="submit_search" type="submit" value="">
+            </form>
+          </div> 
+          <div id="fd"></div>         
+        </div>
+      </div>
+      
+      <div id="content" class="clearfix">
+        <div id="main">
+          
+
+
+
+          
+
+
+<div class="h-entry" style="display:none">
+  <a href="http://san-yun.iteye.com/" class="p-author" target="_blank">san_yun</a>
+</div>
+
+
+<div class="blog_main">
+  <script type="application/ld+json">
+    {
+        "@context": "https://zhanzhang.baidu.com/contexts/cambrian.jsonld",
+        "@id": "http://san-yun.iteye.com/blog/494405",
+        "title": "只读事务还是只读模式",
+        "images": [],
+        "description": "",
+        "pubDate": "2009-10-19T19:31:46"
+    }
+  </script>
+  <div class="blog_title">
+    <h3>
+      <a href="http://san-yun.iteye.com/blog/494405">只读事务还是只读模式</a>
+      <em class="actions">      </em>
+    </h3>
+    <ul class="blog_categories"><strong>博客分类：</strong> <li><a href="http://san-yun.iteye.com/category/10974">java</a></li> </ul>
+        <div class="news_tag"><a href="http://www.iteye.com/blogs/tag/Oracle">Oracle</a><a href="http://www.iteye.com/blogs/tag/Spring">Spring</a><a href="http://www.iteye.com/blogs/tag/Hibernate">Hibernate</a><a href="http://www.iteye.com/blogs/tag/MySQL">MySQL</a><a href="http://www.iteye.com/blogs/tag/JDBC">JDBC</a>&nbsp;</div>
+  </div>
+
+  <div id="blog_content" class="blog_content">
+    学习spring常常听说只读事务，到底什么是只读事务?
+<br>“只读事务”的提法太过笼统.只读事务可以分为两个方面:JDBC和数据库。
+<br>
+<br>JDBC的Connection对象有一个方法setReadOnly。JDK的API描述如下：
+<br><div class="dp-highlighter" id=""><div class="bar"><div class="tools">Java代码 <embed wmode="transparent" src="/javascripts/syntaxhighlighter/clipboard_new.swf" width="14" height="15" flashvars="clipboard=Puts%20this%20connection%20in%20read-only%20mode%20as%20a%20hint%20to%20thedriver%20to%20enable%20%0Adatabase%20optimizations.%20%0A" quality="high" allowscriptaccess="always" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer">&nbsp;<a href="javascript:void()" title="收藏这段代码" onclick="code_favorites_do_favorite(this);return false;"><img class="star" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/icon_star.png" alt="收藏代码"><img class="spinner" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/spinner.gif" style="display:none"></a></div></div><ol start="1" class="dp-j"><li><span><span>Puts&nbsp;</span><span class="keyword">this</span><span>&nbsp;connection&nbsp;in&nbsp;read-only&nbsp;mode&nbsp;as&nbsp;a&nbsp;hint&nbsp;to&nbsp;thedriver&nbsp;to&nbsp;enable&nbsp;&nbsp;&nbsp;</span></span></li><li><span>database&nbsp;optimizations.&nbsp;&nbsp;&nbsp;</span></li></ol></div><pre class="java" name="code" codeable_id="494405" codeable_type="Blog" source_url="http://san-yun.iteye.com/blog/494405" pre_index="0" title="只读事务还是只读模式" style="display: none;">Puts this connection in read-only mode as a hint to thedriver to enable 
+database optimizations. 
+</pre>
+<br>翻译过来的意思“把此连接设置为只读模式，作为的数据库优化的暗示”.这里面有事务隔离吗？没有。甚至SUN的描述都很模糊，只是向数据库驱动做一个启动数据库优化的暗示，不代表一定有效。所以不应该把readOnly作为打开只读事务的判断。
+<br>robbin 在<a href="http://www.iteye.com/topic/8850" target="_blank">只读查询是否需要启动事务管理，兼论只读事务的说法</a>并不十分正确:
+<br><div class="quote_title">robbin 写道</div><div class="quote_div">
+<br>在JDBC中，指定只读事务的办法为： 
+<br>connection.setReadOnly(true); 
+<br>
+<br>在Hibernate中，指定只读事务的办法为： 
+<br>session.setFlushMode(FlushMode.NEVER); 
+<br>此时，Hibernate也会为只读事务提供Session方面的一些优化手段 
+<br>
+<br>在Spring的Hibernate封装中，指定只读事务的办法为： 
+<br>bean配置文件中，prop属性增加“readOnly” 
+<br></div>
+<br>
+<br><a href="http://download.oracle.com/docs/cd/B19306_01/java.102/b14355/apxtips.htm#i1007231" target="_blank">查看oracle的文档对jdbc驱动的描述:</a>
+<br><div class="dp-highlighter" id=""><div class="bar"><div class="tools">Java代码 <embed wmode="transparent" src="/javascripts/syntaxhighlighter/clipboard_new.swf" width="14" height="15" flashvars="clipboard=Transaction%20Isolation%20Levels%20and%20Access%20Modes%0ARead-only%20connections%20are%20supported%20by%20the%20Oracle%20server%2C%20but%20not%20by%20the%20%0AOracle%20JDBC%20drivers.%0A" quality="high" allowscriptaccess="always" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer">&nbsp;<a href="javascript:void()" title="收藏这段代码" onclick="code_favorites_do_favorite(this);return false;"><img class="star" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/icon_star.png" alt="收藏代码"><img class="spinner" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/spinner.gif" style="display:none"></a></div></div><ol start="1" class="dp-j"><li><span><span>Transaction&nbsp;Isolation&nbsp;Levels&nbsp;and&nbsp;Access&nbsp;Modes&nbsp;&nbsp;</span></span></li><li><span>Read-only&nbsp;connections&nbsp;are&nbsp;supported&nbsp;by&nbsp;the&nbsp;Oracle&nbsp;server,&nbsp;but&nbsp;not&nbsp;by&nbsp;the&nbsp;&nbsp;&nbsp;</span></li><li><span>Oracle&nbsp;JDBC&nbsp;drivers.&nbsp;&nbsp;</span></li></ol></div><pre class="java" name="code" codeable_id="494405" codeable_type="Blog" source_url="http://san-yun.iteye.com/blog/494405" pre_index="1" title="只读事务还是只读模式" style="display: none;">Transaction Isolation Levels and Access Modes
+Read-only connections are supported by the Oracle server, but not by the 
+Oracle JDBC drivers.
+</pre>
+<br>Oracle服务器支持Read-only ，这个又是什么意思呢？
+<br>
+<br>为了搞清楚这个所谓的“只读事务”必须先明确一个概念--“事务隔离级别（transaction isolation degree）”，ANSI标准定义了4个隔离级别标准：
+<br><ul>
+<li>READ UNCOMMITTED：最低级别的隔离，通常又称为dirty read，它允许一个事务读取还没commit的数据，这样可能会提高性能，但是dirty read可能不是我们想要的。 
+</li><li>READ COMMITTED：在一个事务中只允许已经commit的记录可见。如果session中select还在查询中，另一session此时insert一条记录，当前事务可以看到修改的记录，从而产生不可重复读取和幻像数据。
+</li><li>REPEATABLE READ：在一个事务开始后，其他session对数据库的修改在本事务中不可见，直到本事务commit或rollback。在一个事务中重复select的结果一样，除非本事务中update数据库。&nbsp;&nbsp; 
+</li><li>SERIALIZABLE：最高级别的隔离，只允许事务串行执行。为了达到此目的，数据库会锁住每行已经读取的记录，其他session不能修改数据直到前一事务结束，事务commit或取消时才释放锁。 
+</li></ul> 
+<br>主流数据库的一般的默认是READ COMMITTED级别。
+<br>
+<br>MYSQL和MS SQLServer遵守了这个定义而oracle没有。oracle只有<a href="http://download.oracle.com/docs/cd/B19306_01/server.102/b14220/consist.htm#i17856" target="_blank">三种事务隔离等级</a>:
+<br><ul>
+<li>Read committed 
+</li><li>Serializable 
+</li><li>Read-only Read-only transactions see only those changes that were committed at the time the transaction began and do not allow INSERT, UPDATE, and DELETE statements
+</li></ul>
+<br>
+<br>前两个Read committed，Serializable 和ANSI的定义是一致的，来看看最关键的第三个Read-only 。Read-only事务只会看到在这个事务开启时间点其他事务提交过的数据，并且不允许执行INSERT, UPDATE,DELETE语句，换句话说,在设置set transaction read only后,当前会话所见的数据图像,将不再受到其他会话事务的影响。
+<br>所以oracle支持的只读事务不是为了优化性能，而是为了让这个事务中所有的查询操作看到的数据是一个时间点（开启事务）上的一致数据。MYSQL,SQL_SERVER根本没有只读事务的概念，但是有REPEATABLE READ，具体看之间的差别。
+<br>
+<br>
+<br>有了这个基础后，再看Connection对象也定义了五个变量和ANSI标准对应:
+<br>
+<br><div class="dp-highlighter" id=""><div class="bar"><div class="tools">Java代码 <embed wmode="transparent" src="/javascripts/syntaxhighlighter/clipboard_new.swf" width="14" height="15" flashvars="clipboard=int%20TRANSACTION_NONE%20%20%3D0%3B%20%20%20%20%2F%2F%E4%B8%8D%E5%8F%97%E6%94%AF%E6%8C%81%E7%9A%84%E4%BA%8B%E5%8A%A1%0Aint%20TRANSACTION_READ_COMMITTED%20%3D1%3B%0Aint%20TRANSACTION_READ_UNCOMMITTED%20%3D%202%3B%0Aint%20TRANSACTION_REPEATABLE_READ%20%3D%204%3B%0Aint%20TRANSACTION_SERIALIZABLE%20%20%3D8%3B%0A" quality="high" allowscriptaccess="always" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer">&nbsp;<a href="javascript:void()" title="收藏这段代码" onclick="code_favorites_do_favorite(this);return false;"><img class="star" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/icon_star.png" alt="收藏代码"><img class="spinner" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/spinner.gif" style="display:none"></a></div></div><ol start="1" class="dp-j"><li><span><span class="keyword">int</span><span>&nbsp;TRANSACTION_NONE&nbsp;&nbsp;=</span><span class="number">0</span><span>;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="comment">//不受支持的事务</span><span>&nbsp;&nbsp;</span></span></li><li><span><span class="keyword">int</span><span>&nbsp;TRANSACTION_READ_COMMITTED&nbsp;=</span><span class="number">1</span><span>;&nbsp;&nbsp;</span></span></li><li><span><span class="keyword">int</span><span>&nbsp;TRANSACTION_READ_UNCOMMITTED&nbsp;=&nbsp;</span><span class="number">2</span><span>;&nbsp;&nbsp;</span></span></li><li><span><span class="keyword">int</span><span>&nbsp;TRANSACTION_REPEATABLE_READ&nbsp;=&nbsp;</span><span class="number">4</span><span>;&nbsp;&nbsp;</span></span></li><li><span><span class="keyword">int</span><span>&nbsp;TRANSACTION_SERIALIZABLE&nbsp;&nbsp;=</span><span class="number">8</span><span>;&nbsp;&nbsp;</span></span></li></ol></div><pre class="java" name="code" codeable_id="494405" codeable_type="Blog" source_url="http://san-yun.iteye.com/blog/494405" pre_index="2" title="只读事务还是只读模式" style="display: none;">int TRANSACTION_NONE  =0;    //不受支持的事务
+int TRANSACTION_READ_COMMITTED =1;
+int TRANSACTION_READ_UNCOMMITTED = 2;
+int TRANSACTION_REPEATABLE_READ = 4;
+int TRANSACTION_SERIALIZABLE  =8;
+</pre>
+<br>
+<br>而Spring也不过是在这上面做封装。TransactionDefinition接口中定义了五个不同的事务隔离级别: 
+<br><div class="dp-highlighter" id=""><div class="bar"><div class="tools">Java代码 <embed wmode="transparent" src="/javascripts/syntaxhighlighter/clipboard_new.swf" width="14" height="15" flashvars="clipboard=int%20ISOLATION_DEFAULT%20%3D%20-1%3B%0Aint%20ISOLATION_READ_UNCOMMITTED%20%3D%20Connection.TRANSACTION_READ_UNCOMMITTED%3B%0Aint%20ISOLATION_READ_COMMITTED%20%3D%20Connection.TRANSACTION_READ_COMMITTED%3B%0Aint%20ISOLATION_REPEATABLE_READ%20%3D%20Connection.TRANSACTION_REPEATABLE_READ%3B%0Aint%20ISOLATION_SERIALIZABLE%20%3D%20Connection.TRANSACTION_SERIALIZABLE%3B%0A" quality="high" allowscriptaccess="always" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer">&nbsp;<a href="javascript:void()" title="收藏这段代码" onclick="code_favorites_do_favorite(this);return false;"><img class="star" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/icon_star.png" alt="收藏代码"><img class="spinner" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/spinner.gif" style="display:none"></a></div></div><ol start="1" class="dp-j"><li><span><span class="keyword">int</span><span>&nbsp;ISOLATION_DEFAULT&nbsp;=&nbsp;-</span><span class="number">1</span><span>;&nbsp;&nbsp;</span></span></li><li><span><span class="keyword">int</span><span>&nbsp;ISOLATION_READ_UNCOMMITTED&nbsp;=&nbsp;Connection.TRANSACTION_READ_UNCOMMITTED;&nbsp;&nbsp;</span></span></li><li><span><span class="keyword">int</span><span>&nbsp;ISOLATION_READ_COMMITTED&nbsp;=&nbsp;Connection.TRANSACTION_READ_COMMITTED;&nbsp;&nbsp;</span></span></li><li><span><span class="keyword">int</span><span>&nbsp;ISOLATION_REPEATABLE_READ&nbsp;=&nbsp;Connection.TRANSACTION_REPEATABLE_READ;&nbsp;&nbsp;</span></span></li><li><span><span class="keyword">int</span><span>&nbsp;ISOLATION_SERIALIZABLE&nbsp;=&nbsp;Connection.TRANSACTION_SERIALIZABLE;&nbsp;&nbsp;</span></span></li></ol></div><pre class="java" name="code" codeable_id="494405" codeable_type="Blog" source_url="http://san-yun.iteye.com/blog/494405" pre_index="3" title="只读事务还是只读模式" style="display: none;">int ISOLATION_DEFAULT = -1;
+int ISOLATION_READ_UNCOMMITTED = Connection.TRANSACTION_READ_UNCOMMITTED;
+int ISOLATION_READ_COMMITTED = Connection.TRANSACTION_READ_COMMITTED;
+int ISOLATION_REPEATABLE_READ = Connection.TRANSACTION_REPEATABLE_READ;
+int ISOLATION_SERIALIZABLE = Connection.TRANSACTION_SERIALIZABLE;
+</pre>
+<br>
+<br>既然没有只读事务的概念，那么提交一个查询是否需要开启一个事务呢?
+<br>不同的数据库可能有不同实现,<a href="http://download.oracle.com/docs/cd/B19306_01/java.102/b14355/apxtips.htm#i1001932" target="_blank">oracle驱动的文档介绍</a>:
+<br>如果关闭Disabling Auto-Commit Mode可以提高一定的性能。
+<br>但是MYSQL好像相反,参见：http://www.iteye.com/topic/1603?page=1
+<br>
+<br>
+  </div>
+
+  
+
+  <div>
+    <!-- 广告位：PC端-iteye博客详情页底部banner2-728*90 -->
+    <script>
+        (function() {
+            var s = "_" + Math.random().toString(36).slice(2);
+            document.write('<div id="' + s + '"></div>');
+            (window.slotbydup=window.slotbydup || []).push({
+                id: '4774193',
+                container: s,
+                size: '728,90',
+                display: 'inlay-fix'
+            });
+        })();
+    </script><div id="_2gt23xmcl8w"></div><script charset="utf-8" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/ccqm(1)"></script><div><iframe width="728" frameborder="0" height="90" scrolling="no" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/s(2).html"></iframe><em id="vsdiitdwda" style="width:0px;height:0px;"></em></div><script type="text/javascript" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/togxxxgpu.js.下载"></script>
+  </div>
+
+
+
+  <div id="bottoms" class="clearfix">
+    <div id="digg_bottom" class="clearfix"><div class="digged"><strong>4</strong> <br>顶</div><div class="digged"><strong>1</strong> <br>踩</div></div>
+    <div id="share_weibo">分享到：
+      <a data-type="sina" href="javascript:;" title="分享到新浪微博"><img src="./只读事务还是只读模式 - san_yun - ITeye博客_files/sina.jpg"></a>
+      <a data-type="qq" href="javascript:;" title="分享到腾讯微博"><img src="./只读事务还是只读模式 - san_yun - ITeye博客_files/tec.jpg"></a>
+    </div>
+  </div>
+
+  <div class="blog_nav">
+    <div class="pre_next">
+      <a href="http://san-yun.iteye.com/blog/574914" class="next" title="JS疑难杂症">JS疑难杂症</a>
+      |
+      <a href="http://san-yun.iteye.com/blog/462083" class="pre" title="有趣的javascript 匿名function ">有趣的javascript 匿名function </a>
+    </div>
+  </div>
+  <div class="blog_bottom">
+    <ul>
+      <li>2009-10-19 19:31</li>
+      <li>浏览 7814</li>
+      <li><a href="http://san-yun.iteye.com/blog/494405#comments">评论(0)</a></li>
+      
+      
+      <li>分类:<a href="http://www.iteye.com/blogs/category/architecture">企业架构</a></li>      
+      <li class="last"><a href="http://www.iteye.com/wiki/blog/494405" target="_blank" class="more">查看更多</a></li>
+    </ul>    
+  </div>
+    
+  <div class="blog_comment">
+    <h5>评论</h5>
+    <a id="comments" name="comments"></a>
+    
+    
+    
+  </div>
+
+  <div class="blog_comment">
+    <h5>发表评论</h5>
+            <p style="text-align:center; margin-top:30px;margin-bottom:0px;"><a href="http://san-yun.iteye.com/login" style="background-color:white;"> <img src="./只读事务还是只读模式 - san_yun - ITeye博客_files/login_icon.png" style="vertical-align:middle; margin-right: 10px;"></a><a href="http://san-yun.iteye.com/login">  您还没有登录,请您登录后再发表评论 </a></p>
+      </div>
+
+  
+      
+<div class="boutique-curr-box blog_comment">
+	  <div class="boutique-curr clearfix" id="album_detail_wrap">
+	    <h5 class="h3titles">相关资源推荐</h5>
+			<ul style="margin-top: 15px" class="clearfix">
+				
+						<li style="width: 50%;float: left;margin: 0;line-height: 25px;overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+							<a href="https://blog.csdn.net/lee4755026/article/details/7881381" target="_blank" title="Spring事务配置的五种方式及事务只读">Spring事务配置的五种方式及事务只读</a>
+						</li>
+				
+						<li style="width: 50%;float: left;margin: 0;line-height: 25px;overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+							<a href="https://blog.csdn.net/liufeng1980423/article/details/72621805" target="_blank" title="处理PostgreSQL Transactoin in Read Only Mode一例">处理PostgreSQL Transactoin in Read Only Mode一例</a>
+						</li>
+				
+						<li style="width: 50%;float: left;margin: 0;line-height: 25px;overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+							<a href="https://blog.csdn.net/lztyll123/article/details/9130133" target="_blank" title="spring的读写事务和只读事务的区别">spring的读写事务和只读事务的区别</a>
+						</li>
+				
+						<li style="width: 50%;float: left;margin: 0;line-height: 25px;overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+							<a href="https://blog.csdn.net/zone_coder/article/details/76615440" target="_blank" title="只读事务和没有事务">只读事务和没有事务</a>
+						</li>
+				
+						<li style="width: 50%;float: left;margin: 0;line-height: 25px;overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+							<a href="https://blog.csdn.net/yulin_ganbo/article/details/78566835" target="_blank" title="只读事务是否做无用功？">只读事务是否做无用功？</a>
+						</li>
+				
+						<li style="width: 50%;float: left;margin: 0;line-height: 25px;overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+							<a href="https://blog.csdn.net/zhaoyangjian724/article/details/48026335" target="_blank" title="8.5.3 Optimizing InnoDB Read-Only Transactions  优化InnoDB 只读事务">8.5.3 Optimizing InnoDB Read-Only Transactions  优化InnoDB 只读事务</a>
+						</li>
+				
+						<li style="width: 50%;float: left;margin: 0;line-height: 25px;overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+							<a href="https://blog.csdn.net/u013486840/article/details/51546335" target="_blank" title="关于spring事务中readonly">关于spring事务中readonly</a>
+						</li>
+				
+						<li style="width: 50%;float: left;margin: 0;line-height: 25px;overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+							<a href="https://blog.csdn.net/ryanemma/article/details/51895728" target="_blank" title="spring事务read-only只读报错处理总结">spring事务read-only只读报错处理总结</a>
+						</li>
+				
+						<li style="width: 50%;float: left;margin: 0;line-height: 25px;overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+							<a href="https://blog.csdn.net/suyujiezhang/article/details/50549305" target="_blank" title="Write operations are not allowed in read-only mode 只读模式下(FlushMode.NEVER/MANUAL)写操作不">Write operations are not allowed in read-only mode 只读模式下(FlushMode.NEVER/MANUAL)写操作不</a>
+						</li>
+				
+						<li style="width: 50%;float: left;margin: 0;line-height: 25px;overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+							<a href="https://blog.csdn.net/qwe6112071/article/details/50984898" target="_blank" title="spring学习笔记(22)声明式事务配置，readOnly无效写无异常">spring学习笔记(22)声明式事务配置，readOnly无效写无异常</a>
+						</li>
+				
+						<li style="width: 50%;float: left;margin: 0;line-height: 25px;overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+							<a href="https://blog.csdn.net/wxwzy738/article/details/43277495" target="_blank" title="只读事务">只读事务</a>
+						</li>
+				
+						<li style="width: 50%;float: left;margin: 0;line-height: 25px;overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+							<a href="https://blog.csdn.net/renminzdb/article/details/42422093" target="_blank" title="【转】oracle 只读事务 与 没有事务">【转】oracle 只读事务 与 没有事务</a>
+						</li>
+				
+						<li style="width: 50%;float: left;margin: 0;line-height: 25px;overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+							<a href="https://blog.csdn.net/tengdazhang770960436/article/details/8609357" target="_blank" title="声明式事务属性：传播行为、隔离级别 、只读提示 、事务超时间隔">声明式事务属性：传播行为、隔离级别 、只读提示 、事务超时间隔</a>
+						</li>
+				
+						<li style="width: 50%;float: left;margin: 0;line-height: 25px;overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+							<a href="https://blog.csdn.net/tang05505622334/article/details/78638961" target="_blank" title="为啥文件有写权限还是说只读">为啥文件有写权限还是说只读</a>
+						</li>
+				
+						<li style="width: 50%;float: left;margin: 0;line-height: 25px;overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+							<a href="https://blog.csdn.net/JosephLoveJesus/article/details/53482919" target="_blank" title="Spring事务传播隔离只读回滚超时5种属性详细">Spring事务传播隔离只读回滚超时5种属性详细</a>
+						</li>
+				
+						<li style="width: 50%;float: left;margin: 0;line-height: 25px;overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+							<a href="https://blog.csdn.net/qq_27069001/article/details/70172200" target="_blank" title="Spring read-only=&quot;true&quot; 只读事务的一些概念">Spring read-only="true" 只读事务的一些概念</a>
+						</li>
+				
+						<li style="width: 50%;float: left;margin: 0;line-height: 25px;overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+							<a href="https://blog.csdn.net/lutinghuan/article/details/7484300" target="_blank" title="在Oracle各启动模式间切换及受限状态、只读状态详解">在Oracle各启动模式间切换及受限状态、只读状态详解</a>
+						</li>
+				
+						<li style="width: 50%;float: left;margin: 0;line-height: 25px;overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+							<a href="https://blog.csdn.net/u012009613/article/details/50287843" target="_blank" title="Hibernate集成Spring出现写操作在只读事物中的问题">Hibernate集成Spring出现写操作在只读事物中的问题</a>
+						</li>
+				
+						<li style="width: 50%;float: left;margin: 0;line-height: 25px;overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+							<a href="https://blog.csdn.net/zhangliao613/article/details/8864165" target="_blank" title="oracle只读事务">oracle只读事务</a>
+						</li>
+				
+						<li style="width: 50%;float: left;margin: 0;line-height: 25px;overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+							<a href="https://blog.csdn.net/qq_23330711/article/details/41877603" target="_blank" title="硬盘写入权限修改Paragon NTFS for Mac">硬盘写入权限修改Paragon NTFS for Mac</a>
+						</li>
+				
+			</ul>
+	  </div>
+</div>
+
+    
+
+</div>
+
+
+<script type="text/javascript">
+  dp.SyntaxHighlighter.HighlightAll('code', true, true);
+
+  $$('#main .blog_content pre[name=code]').each(function(pre, index){ // blog content
+    var post_id = 494405;
+    var location = window.location;
+    source_url = location.protocol + "//" + location.host + location.pathname + location.search;
+    pre.writeAttribute('codeable_id', post_id);
+    pre.writeAttribute('codeable_type', "Blog");
+    pre.writeAttribute('source_url', source_url);
+    pre.writeAttribute('pre_index', index);
+    pre.writeAttribute('title', '只读事务还是只读模式');
+  });
+
+  fix_image_size($$('div.blog_content img'), 700);
+
+  function processComment() {
+    $$('#main .blog_comment > div').each(function(comment){// comment
+      var post_id = comment.id.substr(2);
+      $$("#"+comment.id+" pre[name=code]").each(function(pre, index){
+        var location = window.location;
+        source_url = location.protocol + "//" + location.host + location.pathname + location.search;
+        source_url += "#" + comment.id;
+        pre.writeAttribute('codeable_id', post_id);
+        pre.writeAttribute('codeable_type', "BlogComment");
+        pre.writeAttribute('source_url', source_url);
+        pre.writeAttribute('pre_index', index);
+        pre.writeAttribute('title', '只读事务还是只读模式');
+      });
+    });
+  }
+
+  function quote_comment(id) {
+    new Ajax.Request('/editor/quote', {
+      parameters: {'id':id, 'type':'BlogComment'},
+      onSuccess:function(response){editor.bbcode_editor.textarea.insertAfterSelection(response.responseText);
+        Element.scrollTo(editor.bbcode_editor.textarea.element);}
+    });
+  }
+
+  code_favorites_init();
+  processComment();
+  new WeiboShare({share_buttons: $('share_weibo'), img_scope: $('blog_content')});
+</script>
+
+
+
+
+        </div>
+
+        <div id="local">
+          <div class="local_top"></div>
+          <div id="blog_owner">
+  <div id="blog_owner_logo"><a href="http://san-yun.iteye.com/"><img alt="san_yun的博客" class="logo" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/8dfa939c-4f07-4298-a822-abf8a2cb3eae.jpg" title="san_yun的博客: san_yun" width=""></a></div>
+  <div id="blog_owner_name">san_yun</div>
+</div>
+
+          <div id="blog_actions">
+            <ul>
+              <li>浏览: 1618928 次</li>
+              
+              <li>来自: 杭州</li>
+              <li><img src="./只读事务还是只读模式 - san_yun - ITeye博客_files/offline.gif"></li>
+              
+            </ul>
+          </div>
+          <div id="user_visits" class="clearfix">
+            <h5>最近访客 <span style="font-weight:normal;font-size:12px;padding-left:30px;"><a href="http://san-yun.iteye.com/blog/user_visits">更多访客&gt;&gt;</a></span></h5>
+            
+              <div class="user_visit">
+                <div class="logo"><a href="http://ysmsy.iteye.com/" target="_blank"><img alt="ysmsy的博客" class="logo" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/4094cb6c-aa51-3b8f-a73a-09923ce5a603-thumb.jpg" title="ysmsy的博客: " width="48px"></a></div>
+                <div class="left"><a href="http://ysmsy.iteye.com/" target="_blank" title="ysmsy">ysmsy</a></div>
+              </div>
+            
+              <div class="user_visit">
+                <div class="logo"><a href="http://windleafs.iteye.com/" target="_blank"><img alt="windleafs的博客" class="logo" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/user-logo-thumb.gif" title="windleafs的博客: " width="48px"></a></div>
+                <div class="left"><a href="http://windleafs.iteye.com/" target="_blank" title="windleafs">windleafs</a></div>
+              </div>
+            
+              <div class="user_visit">
+                <div class="logo"><a href="http://wlsehd.iteye.com/" target="_blank"><img alt="wlsehd的博客" class="logo" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/user-logo-thumb.gif" title="wlsehd的博客: " width="48px"></a></div>
+                <div class="left"><a href="http://wlsehd.iteye.com/" target="_blank" title="wlsehd">wlsehd</a></div>
+              </div>
+            
+              <div class="user_visit">
+                <div class="logo"><a href="http://lsfredhat.iteye.com/" target="_blank"><img alt="lsfredhat的博客" class="logo" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/user-logo-thumb.gif" title="lsfredhat的博客: " width="48px"></a></div>
+                <div class="left"><a href="http://lsfredhat.iteye.com/" target="_blank" title="lsfredhat">lsfredhat</a></div>
+              </div>
+            
+          </div>
+
+          
+
+                      <div id="blog_menu">
+              <h5>文章分类</h5>
+              <ul>
+                <li><a href="http://san-yun.iteye.com/">全部博客 (1176)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/10973">webwork (4)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/11292">网摘 (18)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/10974">java (103)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/13588">hibernate (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/142167">Linux (86)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/142268">职业发展 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/155609">activeMQ (2)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/158002">netty (15)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/158003">svn (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/160370">webx3 (12)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/164526">mysql (80)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/173174">css (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/180150">HTML (6)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/182653">apache (3)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/182924">测试 (2)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/190149">javascript (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/202667">储存 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/202817">jvm (6)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/203772">code (14)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/204033">多线程 (12)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/207870">Spring (18)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/208137">webxs (2)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/218623">python (119)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/220694">duitang (0)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/221342">mongo (3)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/221363">nosql (4)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/222422">tomcat (4)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/222668">memcached (20)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/223133">算法 (28)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/223474">django (28)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/224156">shell (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/224895">工作总结 (5)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/226883">solr (42)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/231759">beansdb (6)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/231760">nginx (3)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/235285">性能 (30)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/235512">数据推荐 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/235584">maven (7)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/236012">tonado (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/236378">uwsgi (5)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/238174">hessian (4)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/238706">ibatis (3)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/238949">Security (2)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/239686">HTPP (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/240280">gevent (6)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/240818">读书笔记 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/241143">Maxent (2)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/241494">mogo (0)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/242004">thread (3)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/243987">架构 (5)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/244880">NIO (5)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/244963">正则 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/245415">lucene (5)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/245888">feed (4)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/246451">redis (17)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/246478">TCP (5)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/246538">test (0)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/247216">python，code (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/247253">PIL (3)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/249128">guava (2)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/249191">jython (4)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/249194">httpclient (2)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/249199">cache (3)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/249427">signal (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/249763">dubbo (7)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/250096">HTTP (4)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/250195">json (2)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/250327">java socket (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/250340">io (2)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/250341">socket (22)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/252072">hash (2)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/252073">Cassandra (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/252074">分布式文件系统 (5)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/252080">Dynamo (2)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/252153">gc (8)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/252341">scp (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/252342">rsync (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/252397">mecached (0)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/252518">mongoDB (29)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/252531">Thrift (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/252537">scribe (2)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/253871">服务化 (3)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/254466">问题 (81)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/254490">mat (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/254522">classloader (2)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/254523">javaBean (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/254524">文档集合 (27)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/254526">消息队列 (3)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/255151">nginx，文档集合 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/255779">dboss (12)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/255833">libevent (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/255840">读书 (0)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/256721">数学 (3)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/260188">流程 (0)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/261093">HBase (34)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/261283">自动化测试 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/262007">ubuntu (2)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/262340">并发 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/263589">sping (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/263868">图形 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/264137">freemarker (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/264618">jdbc (3)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/264632">dbcp (0)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/265865">sharding (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/265949">性能测试 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/267155">设计模式 (2)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/268288">unicode (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/269666">OceanBase (3)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/271669">jmagick (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/273619">gunicorn (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/274897">url (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/276593">form (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/276670">安全 (2)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/279912">nlp (8)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/280427">libmemcached (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/281887">规则引擎 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/281925">awk (2)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/282269">服务器 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/283111">snmpd (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/283436">btrace (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/283567">代码 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/284052">cygwin (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/285323">mahout (3)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/289531">电子书 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/291431">机器学习 (5)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/291433">数据挖掘 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/291466">nltk (6)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/292076">pool (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/292195">log4j (2)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/292479">总结 (11)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/292737">c++ (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/293778">java源代码 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/294272">ocr (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/294405">基础算法 (3)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/295207">SA (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/295328">笔记 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/296044">ml (4)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/297150">zokeeper (0)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/297459">jms (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/297947">zookeeper (4)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/297951">zkclient (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/297959">hadoop (13)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/298182">mq (2)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/298462">git (9)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/298482">问题，io (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/298566">storm (11)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/299059">zk (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/299134">性能优化 (2)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/299369">example (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/299710">tmux (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/300158">环境 (2)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/300426">kyro (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/300530">日志系统 (3)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/302046">hdfs (2)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/302122">python_socket (2)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/302219">date (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/303797">elasticsearch (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/304364">jetty (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/304368">树 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/304871">汽车 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/306188">mdrill (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/306237">车 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/306320">日志 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/306404">web (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/306496">编译原理 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/307153">信息检索 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/308280">性能，linux (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/308287">spam (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/309947">序列化 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/310553">fabric (2)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/311180">guice (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/312889">disruptor (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/314606">executor (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/321401">logback (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/328742">开源 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/338318">设计 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/338924">监控 (3)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/344199">english (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/345528">问题记录 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/350182">Bitmap (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/350183">云计算 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/350393">问题排查 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/350879">highchat (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/353165">mac (3)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/354368">docker (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/355809">jdk (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/359610">表达式 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/366744">网络 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/367335">时间管理 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/370840">时间序列 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/371545">OLAP (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/371761">Big Table (0)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/373116">sql (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/374213">kafka (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/374778">md5 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/374922">springboot (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/374948">spring security (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/374956">Spring Boot (3)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/375616">mybatis (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/379936">java8 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/380018">分布式事务 (1)</a></li>
+                
+                  <li><a href="http://san-yun.iteye.com/category/380019">限流 (1)</a></li>
+                
+              </ul>
+            </div>
+            <div id="month_blogs">
+              <h5>社区版块</h5>
+              <ul>
+                <li><a href="http://san-yun.iteye.com/blog/news">我的资讯</a> (0)</li>
+                <li>
+                  <a href="http://san-yun.iteye.com/blog/post">我的论坛</a> (98)
+                </li>
+                <li><a href="http://san-yun.iteye.com/blog/answered_problems">我的问答</a> (0)</li>
+              </ul>
+            </div>
+            <div id="month_blogs">
+              <h5>存档分类</h5>
+              <ul>
+                
+                  <li><a href="http://san-yun.iteye.com/blog/monthblog/2018-05">2018-05</a> (5)</li>
+                
+                  <li><a href="http://san-yun.iteye.com/blog/monthblog/2017-09">2017-09</a> (6)</li>
+                
+                  <li><a href="http://san-yun.iteye.com/blog/monthblog/2017-08">2017-08</a> (6)</li>
+                
+                <li><a href="http://san-yun.iteye.com/blog/monthblog_more">更多存档...</a></li>
+              </ul>
+            </div>
+            
+            
+
+            <div id="guest_books">
+              <h5>最新评论</h5>
+              <ul>
+                
+                <li>
+                  <a href="http://aqu415.iteye.com/" target="_blank" title="Aqu415">Aqu415</a>： 
+                  ，默认是netty还是hassion?<br>
+                  <a href="http://san-yun.iteye.com/blog/1897250#bc2402388">dubbo入门</a>
+                </li>
+                
+                <li>
+                  <a href="http://siphlina.iteye.com/" target="_blank" title="siphlina">siphlina</a>： 
+                  课程——基于Python数据分析与机器学习案例实战教程分享网盘 ...<br>
+                  <a href="http://san-yun.iteye.com/blog/1935786#bc2401858">Python机器学习库</a>
+                </li>
+                
+                <li>
+                  <a href="http://san-yun.iteye.com/" target="_blank" title="san_yun">san_yun</a>： 
+                  leibnitz 写道hi,我想知道,无论在92还是94版本, ...<br>
+                  <a href="http://san-yun.iteye.com/blog/2156663#bc2400644">hbase的行锁与多版本并发控制(MVCC)</a>
+                </li>
+                
+                <li>
+                  <a href="http://leibnitz.iteye.com/" target="_blank" title="leibnitz">leibnitz</a>： 
+                  hi,我想知道,无论在92还是94版本,更新时(如Puts)都 ...<br>
+                  <a href="http://san-yun.iteye.com/blog/2156663#bc2400029">hbase的行锁与多版本并发控制(MVCC)</a>
+                </li>
+                
+                <li>
+                  <a href="http://107x.iteye.com/" target="_blank" title="107x">107x</a>： 
+                  不错，谢谢！<br>
+                  <a href="http://san-yun.iteye.com/blog/1966653#bc2399171">Latent Semantic Analysis(LSA/ LSI)算法简介</a>
+                </li>
+                
+              </ul>
+            </div>
+
+            <div class="local_bottom"></div>
+          
+        </div>
+
+        <div id="nav_show_top_stop" style="height: 500px; z-index: 1000; margin-top: 10px; float: left; clear: left; position: fixed; top: 6756.48px;">
+          <div>
+            <!-- 广告位：PC端-iteye博客详情页左侧Button1-200*200 -->
+            <script>
+                (function() {
+                    var s = "_" + Math.random().toString(36).slice(2);
+                    document.write('<div id="' + s + '"></div>');
+                    (window.slotbydup=window.slotbydup || []).push({
+                        id: '4773203',
+                        container: s,
+                        size: '200,200',
+                        display: 'inlay-fix'
+                    });
+                })();
+            </script><div id="_kizrnfqxld"></div><script charset="utf-8" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/ccqm(2)"></script><div id="_4qejxtoxgaw" style=""><div id="znioqmydl"><iframe width="200" frameborder="0" height="200" scrolling="no" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/s(3).html"></iframe></div></div><script type="text/javascript" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/sncoctctc.js.下载"></script>
+          </div>
+          <div>
+            <!-- 广告位：PC端-iteye博客详情页左侧Button2-200*200 -->
+            <script>
+                (function() {
+                    var s = "_" + Math.random().toString(36).slice(2);
+                    document.write('<div id="' + s + '"></div>');
+                    (window.slotbydup=window.slotbydup || []).push({
+                        id: '4773205',
+                        container: s,
+                        size: '200,200',
+                        display: 'inlay-fix'
+                    });
+                })();
+            </script><div id="_4copdbb1j4r"></div><script charset="utf-8" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/ccqm(3)"></script><div id="_wu0l0djgyod" style=""><abbr style="display:none;padding-right:0px;"></abbr><iframe width="200" frameborder="0" height="200" scrolling="no" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/s(4).html"></iframe></div><script type="text/javascript" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/dyqegnhxu.js.下载"></script>
+          </div>
+        </div>
+        <script>
+
+            setTimeout(function () {
+                var naviga_offsetTop = 0;
+
+                function onload_function() {
+                    naviga_offsetTop = jQuery("#nav_show_top_stop").position().top;
+                    jQuery(window).bind("scroll", naviga_stay_top);
+                    jQuery(window).bind("mousewheel", naviga_stay_top);
+                    jQuery(document).bind("scroll", naviga_stay_top);
+                    jQuery(document).bind("mousewheel", naviga_stay_top);
+                }
+                function naviga_stay_top() {
+
+                    var scrollTop = jQuery(document).scrollTop();
+                    if (scrollTop > (naviga_offsetTop+250)) {
+                        jQuery("#nav_show_top_stop").css({ "position": "fixed" });
+                        jQuery("#nav_show_top_stop").css({ "top": "0px" });
+                    } else {
+                        jQuery("#nav_show_top_stop").css({ "position": "fixed" });
+                        jQuery("#nav_show_top_stop").css({ "top": naviga_offsetTop+250 - scrollTop + "px" }); }
+                }
+                jQuery(document).ready(onload_function());
+            }, 200);
+
+        </script>
+      </div>
+            <script>
+          setTimeout(function () {
+              not_loading = true;
+              pageNum = 3;
+              oList = jQuery("#album_detail_wrap");
+              jQuery(window).scroll(function() {
+                  var scrollTop = jQuery(this).scrollTop();
+                  var scrollHeight = jQuery(document).height() ;
+                  var windowHeight = jQuery(this).height();
+                  if (scrollTop + windowHeight >= scrollHeight) {
+                      if(not_loading){
+                          refreshMore();
+                          setTimeout(function(){
+                              getMore();
+                          },100);
+                      }else{
+                          jQuery(".dl_more").remove();
+                      }
+                  }
+              });
+
+              function getMore(){
+                  not_loading = false;
+                  console.log("getMore......");
+                  jQuery.ajax({
+                      type: 'get',
+                      url: "/blog/ajax_get_blog_recommends/494405",
+                      data:{
+                          page:pageNum
+                      },
+                      //async: false,
+                      dataType: 'json',
+                      success: function (resobj) {
+                          var totalNum = resobj.total_pages;
+                          if(pageNum <= totalNum && resobj.oHtml != '' ){
+                              jQuery(".dl_more").remove();
+                              oList.find('ul').append(resobj.oHtml);
+                              refreshMore();
+                              not_loading = true;
+                              pageNum++;
+                          }else{
+                              not_loading = false;
+                              noMore();
+                          }
+                      },
+                      error: function (err) {
+                          console.log(err);
+                      }
+                  });
+              }
+
+              function noMore(){
+                  jQuery(".dl_more").remove();
+                  if(oList.find(".dl_no_more").length ==0){
+                      oList.append('<div class="dl_no_more" style="font-size:14px; color:red; text-align:center;padding-top:10px; ">我们是很有底线的</div>');
+                  }
+              }
+
+              function refreshMore(){
+                  if(oList.find(".dl_more").length ==0){
+                      oList.append('<div class="dl_more" style="font-size:14px; color:red; text-align:center;padding-top:10px;">上滑加载更多</div>');
+                  }
+              }
+          }, 200);
+      </script>
+  
+      <div id="footer" class="clearfix">
+        <div id="copyright">
+          <hr>
+          声明：ITeye文章版权属于作者，受法律保护。没有作者书面许可不得转载。若作者同意转载，必须以超链接形式标明文章原始出处和作者。<br>
+          © 2003-2018 ITeye.com.   All rights reserved.  [ 京ICP证110151号  京公网安备110105010620 ]
+        </div>
+        <div id="ad_pop">
+          <div class="J_adv" data-view="true" data-mod="ad_popu_64" data-mtp="62" data-order="21" data-con="ad_content_2070">
+            <script id="popuLayer_js_q" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/popuLayer.js.下载" defer="" type="text/javascript"></script>
+            <div id="layerd" style="position: fixed; bottom: 0px; right: 0px; line-height: 0px; z-index: 1000; width: 300px; height: 278px;">
+              <div onclick="jQuery(&#39;#ad_abc&#39;).hide();jQuery(&#39;.J_close&#39;).hide();" class="J_close layer_close" style="display:block;background-color:#efefef;padding:0px;color:#333;font:12px/24px Helvetica,Tahoma,Arial,sans-serif;text-align:right;">
+                关闭
+              </div>
+              <div id="ad_abc">
+                <!-- 广告位：PC端-iteye博客详情右侧弹窗-300*250 -->
+                <script>
+                    (function() {
+                        var s = "_" + Math.random().toString(36).slice(2);
+                        document.write('<div id="' + s + '"></div>');
+                        (window.slotbydup=window.slotbydup || []).push({
+                            id: '4756560',
+                            container: s,
+                            size: '300,250',
+                            display: 'inlay-fix'
+                        });
+                    })();
+                </script><div id="_0mjxewbcb1d"></div><script charset="utf-8" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/ccqm(4)"></script><div style=""><div><iframe width="300" frameborder="0" height="250" scrolling="no" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/s(5).html"></iframe></div></div><script type="text/javascript" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/avnebexun.js.下载"></script>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <script type="text/javascript">
+  document.write("<img src='http://stat.iteye.com/?url="+ encodeURIComponent(document.location.href) + "&referrer=" + encodeURIComponent(document.referrer) + "&user_id=' width='0' height='0' />");
+</script><img src="./只读事务还是只读模式 - san_yun - ITeye博客_files/saved_resource" width="0" height="0">
+
+
+
+    
+    
+    <script src="./只读事务还是只读模式 - san_yun - ITeye博客_files/jquery-1.11.1.min.js.下载" type="text/javascript"></script>
+<script src="./只读事务还是只读模式 - san_yun - ITeye博客_files/tracking-1.0.1.js.下载" type="text/javascript"></script>
+<script language="javascript" type="text/javascript" src="./只读事务还是只读模式 - san_yun - ITeye博客_files/async-1.0.1.js.下载"></script>
+<script src="./只读事务还是只读模式 - san_yun - ITeye博客_files/tracking-1.0.3.js.下载" type="text/javascript"></script>
+<script type="text/javascript">var $csdn_iteye_jq = jQuery.noConflict();// 解决jq与prototype.js命名空间冲突的问题</script>
+    
+	    
+	    <script src="./只读事务还是只读模式 - san_yun - ITeye博客_files/web-storage-cache.min.js.下载" type="text/javascript"></script>
+	    <script src="./只读事务还是只读模式 - san_yun - ITeye博客_files/replace.min.js.下载" type="text/javascript"></script>
+    
+    
+  
+
+</body></html>
