@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Repository and Service layers -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jpa="http://www.springframework.org/schema/data/jpa" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/data/jpa 
+		http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/tx
+            http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+            http://www.springframework.org/schema/aop
+            http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		">
+
+	<context:property-placeholder location="classpath:datasource.properties" />
+
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
+		init-method="init" destroy-method="close">
+		<!-- 基本属性 url、user、password -->
+		<property name="driverClassName" value="${jdbc.driver}" />
+		<property name="url" value="${jdbc_url}" />
+		<property name="username" value="${jdbc_user}" />
+		<property name="password" value="${jdbc_password}" />
+
+		<!-- 配置监控统计拦截的filters -->
+		<property name="filters" value="stat" />
+
+		<!-- 配置初始化大小、最小、最大 -->
+		<property name="maxActive" value="20" />
+		<property name="initialSize" value="1" />
+		<property name="minIdle" value="1" />
+
+		<!-- 配置获取连接等待超时的时间 -->
+		<property name="maxWait" value="60000" />
+
+		<!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+		<property name="timeBetweenEvictionRunsMillis" value="60000" />
+
+		<!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+		<property name="minEvictableIdleTimeMillis" value="300000" />
+
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
+
+		<!-- 打开PSCache，并且指定每个连接上PSCache的大小 -->
+		<property name="poolPreparedStatements" value="true" />
+		<property name="maxOpenPreparedStatements" value="20" />
+	</bean>
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	
+	<bean id="WithUpdate" class="wokao666.club.myapp.dao.noTransaction.WithUpdate"></bean>
+	<bean id="NoUpdate" class="wokao666.club.myapp.dao.noTransaction.NoUpdate"></bean>
+	<bean id="TWithUpdate" class="wokao666.club.myapp.dao.withTransaction.TWithUpdate"></bean>
+	<bean id="TNoUpdate" class="wokao666.club.myapp.dao.withTransaction.TNoUpdate"></bean>
+	<context:component-scan base-package="wokao666.club.*"></context:component-scan>
+	<!-- <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"> 
+		<property name="dataSource" ref="dataSource"></property> </bean> <tx:advice 
+		id="daoAdvice" transaction-manager="transactionManager"> <tx:attributes> 
+		<tx:method name="*" propagation="REQUIRED" /> </tx:attributes> </tx:advice> 
+		<aop:config> <aop:pointcut expression="execution(* wokao666.club.myapp.transcation.*.*(..))" 
+		id="daoMethod" /> <aop:advisor advice-ref="daoAdvice" pointcut-ref="daoMethod" 
+		/> </aop:config> <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate"> 
+		<property name="dataSource" ref="dataSource"></property> </bean> <bean id="service" 
+		class="wokao666.club.myapp.transcation.JdbcDao"></bean> <context:component-scan 
+		base-package="wokao666.club.*"></context:component-scan> -->
+</beans>
